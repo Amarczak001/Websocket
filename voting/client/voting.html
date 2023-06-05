@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Client</title>
+</head>
+<body>
+  <h1>WebSocket Client</h1>
+
+  <button onclick="vote('pizza')">Vote for Pizza</button>
+  <button onclick="vote('pasta')">Vote for Pasta</button>
+
+  <h2>Results:</h2>
+  <p>Pizza: <span id="pizza-result">0</span></p>
+  <p>Pasta: <span id="pasta-result">0</span></p>
+
+  <script>
+    const ws = new WebSocket('ws://localhost:3000/voting');
+
+    // Select the <span> elements for displaying results
+    const pizzaResult = document.getElementById('pizza-result');
+    const pastaResult = document.getElementById('pasta-result');
+
+    function vote(option) {
+      const message = JSON.stringify({ vote: option });
+      ws.send(message);
+    }
+
+    ws.onopen = function () {
+      console.log('Connected to the server!');
+    };
+
+    ws.onmessage = function (event) {
+      console.log('Message received: ' + event.data);
+      const data = JSON.parse(event.data);
+      const results = data.results;
+
+      // Update the results displayed in the <span> elements
+      pizzaResult.textContent = results.pizza.toString();
+      pastaResult.textContent = results.pasta.toString();
+    };
+
+    ws.onerror = function (error) {
+      console.log('Error: ' + error);
+    };
+  </script>
+</body>
+</html>
